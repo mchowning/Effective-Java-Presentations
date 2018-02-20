@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Effective Java - Item 1: Consider Static Factory Methods Instead of Constructors</title>
+<meta name="author" content="(Matt Chowning)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="file:///Users/gzpjpk/dev/reveal.js/css/reveal.css"/>
+
+<link rel="stylesheet" href="file:///Users/gzpjpk/dev/reveal.js/css/theme/moon.css" id="theme"/>
+
+<link rel="stylesheet" href="file:///Users/gzpjpk/dev/reveal.js/lib/css/tomorrow-night_custom.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'file:///Users/gzpjpk/dev/reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<section>
+<section id="slide-orgad9893a">
+<h2 id="orgad9893a">Effective Java</h2>
+<p>
+Item 1
+</p>
+
+<p>
+Consider Static Factory Methods Instead of Constructors
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org57f5199">
+<h2 id="org57f5199">Standard Constructor</h2>
+<p>
+Typical Java will use regular constructors for object creation.
+</p>
+
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>public class Statement {
+
+  public Statement(String string) { ... }
+
+}
+</code></pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org2864a91">
+<h2 id="org2864a91">Static Factory Method</h2>
+<p>
+A static factory method moves the creation logic into one or more static methods.
+</p>
+
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape><lighten>public class Statement {
+
+  private Statement(String string) { ... }</lighten>
+
+  public static Statement exclamation(String string) {
+    return new Statement(string.toUpperCase());
+  }
+<lighten>}</lighten>
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-org763b45a">
+<h2 id="org763b45a">Advantages of Static Factory Methods</h2>
+</section>
+</section>
+<section>
+<section id="slide-org4016a50">
+<h2 id="org4016a50">Can have descriptive names</h2>
+<div class="outline-text-2" id="text-org4016a50">
+</div>
+</section>
+<section id="slide-orga9a2139">
+<h3 id="orga9a2139">Descriptive Names</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>public class Person {
+  private final boolean canAdjustSalaries;
+
+  private Person(boolean canAdjustSalaries) {
+    this.canAdjustSalaries = canAdjustSalaries;
+  }
+
+  public static Person owner() {
+     return new Person(true);
+  }
+
+  public static Person employee() {
+     return new Person(false);
+  }
+}
+</code></pre>
+</div>
+</section>
+<section id="slide-orge03cdbb">
+<h3 id="orge03cdbb">Descriptive Names</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape><lighten>public class Person {
+  private final boolean canAdjustSalaries;
+
+  private Person(boolean canAdjustSalaries) {
+    this.canAdjustSalaries = canAdjustSalaries;
+  }
+</lighten>
+  public static Person owner() {
+     return new Person(true);
+  }
+
+  public static Person employee() {
+     return new Person(false);
+  }
+<lighten>}</lighten>
+</code></pre>
+</div>
+</section>
+<section id="slide-org953adef">
+<h3 id="org953adef">Descriptive Names</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>public class Person {
+  private final boolean canAdjustSalaries;
+
+  private Person(boolean canAdjustSalaries) {
+    this.canAdjustSalaries = canAdjustSalaries;
+  }
+
+  public static Person owner() {
+     return new Person(true);
+  }
+
+  public static Person employee() {
+     return new Person(false);
+  }
+}
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgc670b19">
+<h2 id="orgc670b19">Multiple static factory methods can use the same parameters</h2>
+<div class="outline-text-2" id="text-orgc670b19">
+</div>
+</section>
+<section id="slide-orge9954de">
+<h3 id="orge9954de">Multiple methods with the same parameters</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>public class Person {
+  private final boolean canAdjustSalaries;
+  private final String name;
+
+  private Person(String name, boolean canAdjustSalaries) { ... }
+
+  public static Person owner(String name) {
+     return new Person(name, true);
+  }
+
+  public static Person employee(String name) {
+     return new Person(name, false);
+  }
+}
+</code></pre>
+</div>
+</section>
+<section id="slide-org3bed8e4">
+<h3 id="org3bed8e4">Multiple methods with the same parameters</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape><lighten>public class Person {
+  private final boolean canAdjustSalaries;
+  private final String name;
+
+  private Person(String name, boolean canAdjustSalaries) { ... }</lighten>
+
+  public static Person owner(String name) {
+     return new Person(name, true);
+  }
+
+  public static Person employee(String name) {
+     return new Person(name, false);
+  }
+<lighten>}</lighten>
+</code></pre>
+</div>
+</section>
+<section id="slide-org7753f09">
+<h3 id="org7753f09">Multiple methods with the same parameters</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>public class Person {
+  private final boolean canAdjustSalaries;
+  private final String name;
+
+  private Person(String name, boolean canAdjustSalaries) { ... }
+
+  public static Person owner(String name) {
+     return new Person(name, true);
+  }
+
+  public static Person employee(String name) {
+     return new Person(name, false);
+  }
+}
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-org8515ad4">
+<h2 id="org8515ad4">Do not have to create a new object on each invocation</h2>
+<ul>
+<li class="fragment roll-in">Singleton</li>
+<li class="fragment roll-in">Immutable value</li>
+
+</ul>
+</section>
+<section id="slide-orgd75dffd">
+<h3 id="orgd75dffd">Do not have to create a new object on each invocation</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>public class Person {
+  private static Map<Integer, Person> cached;
+
+  private Person(int uniqueId) { ... }
+
+  public static Person employee(int uniqueId) {
+    if (cached.contains(uniqueId)) {
+      return cached.get(uniqueId);
+    } else {
+      Person p = new Person(uniqueId);
+      cached.put(uniqueId, p);
+      return p;
+    }
+  }
+}
+</code></pre>
+</div>
+</section>
+<section id="slide-org3ca0094">
+<h3 id="org3ca0094">Do not have to create a new object on each invocation</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape><lighten>public class Person {
+  </lighten>private static Map<Integer, Person> cached;<lighten>
+
+  private Person(int uniqueId) { ... }
+
+  public static Person employee(int uniqueId) {
+    </lighten>if (cached.contains(uniqueId)) {
+      return cached.get(uniqueId);
+    <lighten>} else {
+      Person p = new Person(uniqueId);
+      cached.put(uniqueId, p);
+      return p;
+    }
+  }
+}</lighten>
+</code></pre>
+</div>
+</section>
+<section id="slide-org05e4b57">
+<h3 id="org05e4b57">Do not have to create a new object on each invocation</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>public class Person {
+  private static Map<Integer, Person> cached;
+
+  private Person(int uniqueId) { ... }
+
+  public static Person employee(int uniqueId) {
+    if (cached.contains(uniqueId)) {
+      return cached.get(uniqueId);
+    } else {
+      Person p = new Person(uniqueId);
+      cached.put(uniqueId, p);
+      return p;
+    }
+  }
+}
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-orgc012a08">
+<h2 id="orgc012a08">Can return an object of any subtype</h2>
+<div class="outline-text-2" id="text-orgc012a08">
+</div>
+</section>
+<section id="slide-org11fe446">
+<h3 id="org11fe446">Can return an object of any subtype</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>// with Java 8 interfaces can have static methods
+interface Person {
+  public static Person owner() {
+    return new Owner();
+  }
+
+  public static Person employee() {
+    return new Employee();
+  }
+}
+
+// Classes that are not exposed to clients
+private class Owner implements Person {...}
+private class Employee implements Person {...}
+</code></pre>
+</div>
+
+</section>
+<section id="slide-orgd7f4b86">
+<h3 id="orgd7f4b86">Can return an object of any subtype</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>// with Java 8 interfaces can have static methods
+interface Person {
+  public static Person owner() {
+    return new Owner();
+  }
+
+  public static Person employee() {
+    return new Employee();
+  }
+}
+
+<lighten>// Classes that are not exposed to clients
+private class Owner implements Person {...}
+private class Employee implmeents Person {...}</lighten>
+</code></pre>
+</div>
+</section>
+<section id="slide-orga7c14a8">
+<h3 id="orga7c14a8">Can return an object of any subtype</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape><lighten>// with Java 8 interfaces can have static methods
+interface Person {
+  public static Person owner() {
+    return new Owner();
+  }
+
+  public static Person employee() {
+    return new Employee();
+  }
+}</lighten>
+
+// Classes that are not exposed to clients
+private class Owner implements Person {...}
+private class Employee implements Person {...}
+</code></pre>
+</div>
+</section>
+<section id="slide-org25675a7">
+<h3 id="org25675a7">Can return an object of any subtype</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>// with Java 8 interfaces can have static methods
+interface Person {
+  public static Person owner() {
+    return new Owner();
+  }
+
+  public static Person employee() {
+    return new Employee();
+  }
+}
+
+// Classes that are not exposed to clients
+private class Owner implements Person {...}
+private class Employee implements Person {...}
+</code></pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-org2358cff">
+<h2 id="org2358cff">Can vary the returned class based on function parameters</h2>
+<div class="outline-text-2" id="text-org2358cff">
+</div>
+</section>
+<section id="slide-orgaa859ae">
+<h3 id="orgaa859ae">Can vary the returned class based on function parameters</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>interface Person {
+  public static Person person(bolean isOwner) {
+    if (isOwner) {
+      return new Owner();
+    } else {
+      return new Employee();
+    }
+  }
+}
+
+private class Owner implements Person {...}
+private class Employee implements Person {...}
+</code></pre>
+</div>
+</section>
+<section id="slide-org1ddcb65">
+<h3 id="org1ddcb65">Can vary the returned class based on function parameters</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape><lighten>interface Person {</lighten>
+  public static Person person(bolean isOwner) {
+    if (isOwner) {
+      return new Owner();
+    } else {
+      return new Employee();
+    }
+  }<lighten>
+}
+
+private class Owner implements Person {...}
+private class Employee implements Person {...}</lighten>
+</code></pre>
+</div>
+</section>
+<section id="slide-org6bb1373">
+<h3 id="org6bb1373">Can vary the returned class based on function parameters</h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>interface Person {
+  public static Person person(bolean isOwner) {
+    if (isOwner) {
+      return new Owner();
+    } else {
+      return new Employee();
+    }
+  }
+}
+
+private class Owner implements Person {...}
+private class Employee implements Person {...}
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-org3df919a">
+<h2 id="org3df919a">Can decouple construction logic from class</h2>
+<div class="outline-text-2" id="text-org3df919a">
+</div>
+</section>
+<section id="slide-orgd192c2e">
+<h3 id="orgd192c2e">Underlies service provider frameworks</h3>
+<blockquote nil>
+<p>
+"a system in which a provider implements a service, and the system makes the implementations available to clients, decoupling the clients from the implementations."
+</p>
+</blockquote>
+</section>
+<section id="slide-org7d794e4">
+<h3 id="org7d794e4"></h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>public interface PersonProvider {
+  Person getPerson();
+}<lighten>
+
+public class Person {
+  private final PersonProvider personProvider;
+
+  protected Person(PersonProvider personProvider) {
+    this.personProvider = personProvider;
+  }
+
+  public static Person person() {
+    return personProvider.getPerson();
+  }
+}</lighten>
+</code></pre>
+</div>
+</section>
+<section id="slide-org838989a">
+<h3 id="org838989a"></h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape><lighten>public interface PersonProvider {
+  Person getPerson();
+}
+
+public class Person {
+  private final PersonProvider personProvider;</lighten>
+
+  protected Person(PersonProvider personProvider) {
+    this.personProvider = personProvider;
+  }<lighten>
+
+  public static Person person() {
+    return personProvider.getPerson();
+  }
+}</lighten>
+</code></pre>
+</div>
+</section>
+<section id="slide-org4cbf6bb">
+<h3 id="org4cbf6bb"></h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape><lighten>public interface PersonProvider {
+  Person getPerson();
+}
+
+public class Person {
+  private final PersonProvider personProvider;
+
+  protected Person(PersonProvider personProvider) {
+    this.personProvider = personProvider;
+  }</lighten>
+
+  public static Person person() {
+    return personProvider.getPerson();
+  }
+<lighten>}</lighten>
+</code></pre>
+</div>
+</section>
+<section id="slide-org928a2f0">
+<h3 id="org928a2f0"></h3>
+<div class="org-src-container">
+
+<pre><code class="java" data-noescape>public interface PersonProvider {
+  Person getPerson();
+}
+
+public class Person {
+  private final PersonProvider personProvider;
+
+  protected Person(PersonProvider personProvider) {
+    this.personProvider = personProvider;
+  }
+
+  public static Person person() {
+    return personProvider.getPerson();
+  }
+}
+</code></pre>
+</div>
+</section>
+</section>
+<section>
+<section id="slide-org03509a5">
+<h2 id="org03509a5">Limitations</h2>
+<div class="outline-text-2" id="text-org03509a5">
+</div>
+</section>
+<section id="slide-orgf6bf3ae">
+<h3 id="orgf6bf3ae">Classes without public or protected constructors cannot be subclassed</h3>
+<p class="fragment (roll-in)">
+Can be a blessing in disguise in some cases since it encourages composition over inheritance.
+</p>
+</section>
+<section id="slide-org660ab4a">
+<h3 id="org660ab4a">Static factory methods can be hard to find</h3>
+<p>
+Static factory methods do not stand out in API documentation the same way that constructors do. 
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org54349fd">
+<h2 id="org54349fd"></h2>
+<blockquote nil>
+<p>
+"In summary, static factory methods and public constructors both have their uses, and it pays to understand their relative merits. Often static factories are preferable, so avoid the reflex to provide public constructors without first considering static factories."
+</p>
+</blockquote>
+</section>
+</section>
+</div>
+</div>
+<script src="file:///Users/gzpjpk/dev/reveal.js/lib/js/head.min.js"></script>
+<script src="file:///Users/gzpjpk/dev/reveal.js/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: false,
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'fade-in', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'file:///Users/gzpjpk/dev/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+ { src: 'file:///Users/gzpjpk/dev/reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }]
+});
+</script>
+</body>
+</html>

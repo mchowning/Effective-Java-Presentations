@@ -1,0 +1,431 @@
+#+title: Effective Java - Item 1: Consider Static Factory Methods Instead of Constructors
+#+author: Matt Chowning
+# #+REVEAL_TRANS: appear
+#+REVEAL_TRANS: fade-in
+#+REVEAL_PLUGINS: (highlight notes)
+#+REVEAL_HIGHLIGHT_CSS: %r/lib/css/tomorrow-night_custom.css
+# #+REVEAL_HIGHLIGHT_CSS: %r/lib/css/highlight.js/solarized-dark.css
+# #+REVEAL_HLEVEL: 2
+#+OPTIONS: num:nil reveal_title_slide:nil toc:nil reveal_slide_number:nil
+
+* Effective Java
+Item 1
+
+Consider Static Factory Methods Instead of Constructors
+* Standard Constructor
+
+Typical Java will use regular constructors for object creation.
+
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+public class Statement {
+    
+  public Statement(String string) { ... }
+
+}
+#+END_SRC
+
+* Static Factory Method
+A static factory method moves the creation logic into one or more static methods.
+
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+<lighten>public class Statement {
+
+  private Statement(String string) { ... }</lighten>
+  
+  public static Statement exclamation(String string) {
+    return new Statement(string.toUpperCase());
+  }
+<lighten>}</lighten>
+#+END_SRC
+* Advantages of Static Factory Methods
+* Can have descriptive names
+** Descriptive Names
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+public class Person {
+  private final boolean canAdjustSalaries;
+
+  private Person(boolean canAdjustSalaries) {
+    this.canAdjustSalaries = canAdjustSalaries;
+  }
+
+  public static Person owner() {
+     return new Person(true);
+  }
+
+  public static Person employee() {
+     return new Person(false);
+  }
+}
+#+END_SRC
+** Descriptive Names
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+<lighten>public class Person {
+  private final boolean canAdjustSalaries;
+
+  private Person(boolean canAdjustSalaries) {
+    this.canAdjustSalaries = canAdjustSalaries;
+  }
+</lighten>
+  public static Person owner() {
+     return new Person(true);
+  }
+
+  public static Person employee() {
+     return new Person(false);
+  }
+<lighten>}</lighten>
+#+END_SRC
+** Descriptive Names
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+public class Person {
+  private final boolean canAdjustSalaries;
+
+  private Person(boolean canAdjustSalaries) {
+    this.canAdjustSalaries = canAdjustSalaries;
+  }
+
+  public static Person owner() {
+     return new Person(true);
+  }
+
+  public static Person employee() {
+     return new Person(false);
+  }
+}
+#+END_SRC
+* Multiple static factory methods can use the same parameters
+** Multiple methods with the same parameters
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+public class Person {
+  private final boolean canAdjustSalaries;
+  private final String name;
+
+  private Person(String name, boolean canAdjustSalaries) { ... }
+
+  public static Person owner(String name) {
+     return new Person(name, true);
+  }
+
+  public static Person employee(String name) {
+     return new Person(name, false);
+  }
+}
+#+END_SRC
+** Multiple methods with the same parameters
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+<lighten>public class Person {
+  private final boolean canAdjustSalaries;
+  private final String name;
+
+  private Person(String name, boolean canAdjustSalaries) { ... }</lighten>
+
+  public static Person owner(String name) {
+     return new Person(name, true);
+  }
+
+  public static Person employee(String name) {
+     return new Person(name, false);
+  }
+<lighten>}</lighten>
+#+END_SRC
+** Multiple methods with the same parameters
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+public class Person {
+  private final boolean canAdjustSalaries;
+  private final String name;
+
+  private Person(String name, boolean canAdjustSalaries) { ... }
+
+  public static Person owner(String name) {
+     return new Person(name, true);
+  }
+
+  public static Person employee(String name) {
+     return new Person(name, false);
+  }
+}
+#+END_SRC
+* Do not have to create a new object on each invocation
+#+ATTR_REVEAL: :frag (roll-in)
+- Singleton
+- Immutable value
+** Do not have to create a new object on each invocation
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+public class Person {
+  private static Map<Integer, Person> cached;
+
+  private Person(int uniqueId) { ... }
+
+  public static Person employee(int uniqueId) {
+    if (cached.contains(uniqueId)) {
+      return cached.get(uniqueId);
+    } else {
+      Person p = new Person(uniqueId);
+      cached.put(uniqueId, p);
+      return p;
+    }
+  }
+}
+#+END_SRC
+** Do not have to create a new object on each invocation
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+<lighten>public class Person {
+  </lighten>private static Map<Integer, Person> cached;<lighten>
+
+  private Person(int uniqueId) { ... }
+
+  public static Person employee(int uniqueId) {
+    </lighten>if (cached.contains(uniqueId)) {
+      return cached.get(uniqueId);
+    <lighten>} else {
+      Person p = new Person(uniqueId);
+      cached.put(uniqueId, p);
+      return p;
+    }
+  }
+}</lighten>
+#+END_SRC
+** Do not have to create a new object on each invocation
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+public class Person {
+  private static Map<Integer, Person> cached;
+
+  private Person(int uniqueId) { ... }
+
+  public static Person employee(int uniqueId) {
+    if (cached.contains(uniqueId)) {
+      return cached.get(uniqueId);
+    } else {
+      Person p = new Person(uniqueId);
+      cached.put(uniqueId, p);
+      return p;
+    }
+  }
+}
+#+END_SRC
+* Can return an object of any subtype
+** Can return an object of any subtype
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+// with Java 8 interfaces can have static methods
+interface Person {
+  public static Person owner() {
+    return new Owner();
+  }
+
+  public static Person employee() {
+    return new Employee();
+  }
+}
+
+// Classes that are not exposed to clients
+private class Owner implements Person {...}
+private class Employee implements Person {...}
+#+END_SRC
+
+** Can return an object of any subtype
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+// with Java 8 interfaces can have static methods
+interface Person {
+  public static Person owner() {
+    return new Owner();
+  }
+
+  public static Person employee() {
+    return new Employee();
+  }
+}
+
+<lighten>// Classes that are not exposed to clients
+private class Owner implements Person {...}
+private class Employee implmeents Person {...}</lighten>
+#+END_SRC
+** Can return an object of any subtype
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+<lighten>// with Java 8 interfaces can have static methods
+interface Person {
+  public static Person owner() {
+    return new Owner();
+  }
+
+  public static Person employee() {
+    return new Employee();
+  }
+}</lighten>
+
+// Classes that are not exposed to clients
+private class Owner implements Person {...}
+private class Employee implements Person {...}
+#+END_SRC
+** Can return an object of any subtype
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+// with Java 8 interfaces can have static methods
+interface Person {
+  public static Person owner() {
+    return new Owner();
+  }
+
+  public static Person employee() {
+    return new Employee();
+  }
+}
+
+// Classes that are not exposed to clients
+private class Owner implements Person {...}
+private class Employee implements Person {...}
+#+END_SRC
+
+* Can vary the returned class based on function parameters
+** Can vary the returned class based on function parameters
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+interface Person {
+  public static Person person(bolean isOwner) {
+    if (isOwner) {
+      return new Owner();
+    } else {
+      return new Employee();
+    }
+  }
+}
+
+private class Owner implements Person {...}
+private class Employee implements Person {...}
+#+END_SRC
+** Can vary the returned class based on function parameters
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+<lighten>interface Person {</lighten>
+  public static Person person(bolean isOwner) {
+    if (isOwner) {
+      return new Owner();
+    } else {
+      return new Employee();
+    }
+  }<lighten>
+}
+
+private class Owner implements Person {...}
+private class Employee implements Person {...}</lighten>
+#+END_SRC
+** Can vary the returned class based on function parameters
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+interface Person {
+  public static Person person(bolean isOwner) {
+    if (isOwner) {
+      return new Owner();
+    } else {
+      return new Employee();
+    }
+  }
+}
+
+private class Owner implements Person {...}
+private class Employee implements Person {...}
+#+END_SRC
+* Can decouple construction logic from class
+** Underlies service provider frameworks
+#+BEGIN_QUOTE
+"a system in which a provider implements a service, and the system makes the implementations available to clients, decoupling the clients from the implementations."
+#+END_QUOTE
+** 
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+public interface PersonProvider {
+  Person getPerson();
+}<lighten>
+
+public class Person {
+  private final PersonProvider personProvider;
+
+  protected Person(PersonProvider personProvider) {
+    this.personProvider = personProvider;
+  }
+
+  public static Person person() {
+    return personProvider.getPerson();
+  }
+}</lighten>
+#+END_SRC
+** 
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+<lighten>public interface PersonProvider {
+  Person getPerson();
+}
+
+public class Person {
+  private final PersonProvider personProvider;</lighten>
+
+  protected Person(PersonProvider personProvider) {
+    this.personProvider = personProvider;
+  }<lighten>
+
+  public static Person person() {
+    return personProvider.getPerson();
+  }
+}</lighten>
+#+END_SRC
+** 
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+<lighten>public interface PersonProvider {
+  Person getPerson();
+}
+
+public class Person {
+  private final PersonProvider personProvider;
+
+  protected Person(PersonProvider personProvider) {
+    this.personProvider = personProvider;
+  }</lighten>
+
+  public static Person person() {
+    return personProvider.getPerson();
+  }
+<lighten>}</lighten>
+#+END_SRC
+** 
+#+ATTR_REVEAL: :code_attribs data-noescape
+#+BEGIN_SRC java
+public interface PersonProvider {
+  Person getPerson();
+}
+
+public class Person {
+  private final PersonProvider personProvider;
+
+  protected Person(PersonProvider personProvider) {
+    this.personProvider = personProvider;
+  }
+
+  public static Person person() {
+    return personProvider.getPerson();
+  }
+}
+#+END_SRC
+* Limitations
+** Classes without public or protected constructors cannot be subclassed
+#+ATTR_REVEAL: :frag (roll-in)
+Can be a blessing in disguise in some cases since it encourages composition over inheritance.
+** Static factory methods can be hard to find
+Static factory methods do not stand out in API documentation the same way that constructors do. 
+* 
+#+BEGIN_QUOTE
+"In summary, static factory methods and public constructors both have their uses, and it pays to understand their relative merits. Often static factories are preferable, so avoid the reflex to provide public constructors without first considering static factories."
+#+END_QUOTE
